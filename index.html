@@ -3,226 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로스트아크 통합 계산기</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>LOA 통합 계산기</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Base styles */
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1e40af;
+            --bg-dark: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow: #8b5cf6;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif; /* Using Inter font */
+            font-family: 'Pretendard', sans-serif;
         }
 
         body {
-            background: url('https://i.imgur.com/GAlbv0G.jpg') center/cover no-repeat fixed;
+            background: #0f172a url('https://i.imgur.com/GAlbv0G.jpg') center/cover no-repeat fixed;
             min-height: 100vh;
             display: flex;
-            color: #374151; /* Default text color */
+            color: var(--text-main);
         }
 
-        /* Sidebar styles */
         .sidebar {
             width: 280px;
-            /* Changed transparency from 0.95 to 0.65 for more background visibility */
-            background: rgba(30, 41, 59, 0.65);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.3);
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            padding: 24px;
             display: flex;
             flex-direction: column;
-            border-top-right-radius: 15px;
-            border-bottom-right-radius: 15px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            z-index: 50;
         }
 
-        .logo {
+        .logo-container {
             width: 100%;
-            /* Increased height by three times (from 80px to 240px) */
-            height: 240px;
+            height: 150px;
             background: url('https://i.imgur.com/5sjUCyF.jpg') center/contain no-repeat;
-            margin-bottom: 30px;
-            border-radius: 10px;
-        }
-
-        .menu {
-            flex: 1;
-        }
-
-        .menu-item {
-            width: 100%;
-            padding: 15px 20px;
-            margin-bottom: 10px;
-            background: rgba(59, 130, 246, 0.1);
-            border: 2px solid rgba(59, 130, 246, 0.3);
+            margin-bottom: 32px;
             border-radius: 12px;
-            color: #e2e8f0;
-            font-size: 16px;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .nav-item {
+            padding: 14px 20px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f1f5f9;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
             text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .menu-item:hover {
-            background: rgba(59, 130, 246, 0.2);
-            border-color: rgba(59, 130, 246, 0.6);
-            transform: translateX(5px);
-        }
-
-        .menu-item.active {
-            background: linear-gradient(45deg, #3b82f6, #1e40af);
-            border-color: #3b82f6;
+        .nav-item.active {
+            background: var(--primary);
             color: white;
-            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
         }
 
-        /* Main content styles */
         .main-content {
             flex: 1;
-            padding: 30px;
-            overflow-y: auto;
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        .calculator-section {
+        .section {
             display: none;
+            animation: fadeIn 0.4s ease-out;
         }
 
-        .calculator-section.active {
+        .section.active {
             display: block;
-        }
-
-        .calculator-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            max-width: 1200px;
-            margin: 0 auto; /* Center the grid */
-        }
-
-        .calculator-card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .calculator-card h3 {
-            color: #1e293b;
-            margin-bottom: 20px;
-            font-size: 1.3em;
-            font-weight: 700;
-            text-align: center;
-            border-bottom: 2px solid #3b82f6;
-            padding-bottom: 10px;
-        }
-
-        /* Form elements */
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            color: #374151;
-            font-size: 14px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s ease, background 0.3s ease;
-            background: #f9fafb;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            background: white;
-        }
-
-        /* Button groups */
-        .button-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 8px;
-            margin-top: 6px;
-        }
-
-        .option-btn {
-            padding: 8px 12px;
-            border: 2px solid #e5e7eb;
-            border-radius: 6px;
-            background: white;
-            color: #374151;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .option-btn:hover {
-            border-color: #3b82f6;
-            background: #eff6ff;
-        }
-
-        .option-btn.active {
-            border-color: #3b82f6;
-            background: #3b82f6;
-            color: white;
-        }
-
-        .option-btn:disabled {
-            background: #f3f4f6;
-            color: #9ca3af;
-            cursor: not-allowed;
-        }
-
-        .calculate-btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(45deg, #3b82f6, #1e40af);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 15px;
-        }
-
-        .calculate-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-        }
-
-        .calculate-btn:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        /* Result display */
-        .result {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(248, 250, 252, 0.9);
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            display: none;
-        }
-
-        .result.show {
-            display: block;
-            animation: fadeIn 0.5s ease;
         }
 
         @keyframes fadeIn {
@@ -230,926 +104,431 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .result h4 {
-            color: #1e293b;
-            margin-bottom: 12px;
-            font-size: 1em;
-            font-weight: 600;
-        }
-
-        .result-item {
-            margin-bottom: 8px;
-            padding: 8px 12px;
-            background: white;
-            border-radius: 6px;
-            border-left: 3px solid #3b82f6;
-            font-size: 13px;
-        }
-
-        /* Specific result item styles */
-        .rank-fighter {
-            background: #f0fdf4;
-            border-left-color: #22c55e;
-            color: #15803d;
-        }
-        .rank-crucial {
-            background: #fffbeb;
-            border-left-color: #f59e0b;
-            color: #d97706;
-        }
-        .rank-bloody {
-            background: #fef2f2;
-            border-left-color: #ef4444;
-            color: #dc2626;
-        }
-
-        .cutoff-info {
-            background: #eff6ff;
-            border-left-color: #3b82f6;
-            color: #1e40af;
-        }
-
-        .auto-input {
-            background: #f0fdf4 !important;
-            border-color: #22c55e !important;
-        }
-
-        /* Dealer selection for '버러지 딜러 계산기' */
-        .dealer-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            padding: 8px;
-            background: white;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .dealer-label {
-            min-width: 60px;
-            font-weight: 600;
-            color: #374151;
-            font-size: 12px;
-        }
-
-        .dealer-buttons {
-            display: flex;
-            gap: 4px;
-            flex: 1;
-        }
-
-        .dealer-btn {
-            flex: 1;
-            padding: 6px 8px;
-            border: 1px solid #e5e7eb;
-            border-radius: 4px;
-            background: white;
-            color: #374151;
-            font-size: 10px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .dealer-btn.fighter { border-color: #22c55e; color: #15803d; }
-        .dealer-btn.fighter.active { background: #22c55e; color: white; }
-        .dealer-btn.crucial { border-color: #f59e0b; color: #d97706; }
-        .dealer-btn.crucial.active { background: #f59e0b; color: white; }
-        .dealer-btn.bloody { border-color: #ef4444; color: #dc2626; }
-        .dealer-btn.bloody.active { background: #ef4444; color: white; }
-        .dealer-btn.unknown { border-color: #6b7280; color: #4b5563; }
-        .dealer-btn.unknown.active { background: #6b7280; color: white; }
-
-        /* Congratulations message */
-        .congratulations {
-            background: linear-gradient(135deg, #ec4899, #f97316);
-            color: white;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 600;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            animation: celebration 1s ease-in-out;
-        }
-
-        @keyframes celebration {
-            0% { transform: scale(0.9); opacity: 0; }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .profit { color: #059669; font-weight: 600; }
-        .loss { color: #dc2626; font-weight: 600; }
-
-        /* Auction recommendation cards */
-        .auction-recommendation {
+        .grid-layout {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 15px 0;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
         }
 
-        .recommendation-card {
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            border: 2px solid;
-            transition: transform 0.2s ease;
-        }
-
-        .recommendation-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .recommendation-card.profit-card {
-            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-            border-color: #22c55e;
-            color: #15803d;
-        }
-
-        .recommendation-card.breakeven-card {
-            background: linear-gradient(135deg, #fffbeb, #fef3c7);
-            border-color: #f59e0b;
-            color: #d97706;
-        }
-
-        .recommendation-card .card-icon {
-            font-size: 24px;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .recommendation-card .card-title {
-            font-weight: 700;
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-
-        .recommendation-card .card-amount {
-            font-size: 18px;
-            font-weight: 800;
-            margin-bottom: 5px;
-        }
-
-        .recommendation-card .card-desc {
-            font-size: 11px;
-            opacity: 0.8;
-        }
-
-        .single-calculator {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Custom Alert/Message Box */
-        .message-box-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .message-box-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .message-box {
-            background: white;
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary);
+            color: var(--bg-dark);
+        }
+
+        .field { margin-bottom: 20px; }
+        .field label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-muted); }
+
+        .btn-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .btn-opt {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 65px;
             text-align: center;
-            max-width: 400px;
-            width: 90%;
-            transform: translateY(-20px);
-            transition: transform 0.3s ease;
         }
 
-        .message-box-overlay.show .message-box {
-            transform: translateY(0);
+        .btn-opt.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .btn-opt:disabled { background: #f1f5f9; color: #cbd5e1; cursor: not-allowed; border-color: #f1f5f9; }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
         }
 
-        .message-box h4 {
-            font-size: 1.2em;
-            color: #1e293b;
-            margin-bottom: 15px;
-        }
-
-        .message-box p {
-            font-size: 0.95em;
-            color: #475569;
-            margin-bottom: 25px;
-            line-height: 1.5;
-        }
-
-        .message-box button {
-            background: linear-gradient(45deg, #3b82f6, #1e40af);
+        .btn-calc {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 10px 25px;
-            border-radius: 8px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
             cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            margin-top: 10px;
         }
 
-        .message-box button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        .btn-calc:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+        .result-box {
+            margin-top: 24px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border-left: 5px solid var(--primary);
+            display: none;
         }
 
+        .result-box.active { display: block; }
 
-        /* Responsive adjustments */
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #e2e8f0;
+            align-items: center;
+        }
+
+        .rank-tag {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 0.9rem;
+        }
+
+        .tag-bloody { background: #fee2e2; color: #ef4444; }
+        .tag-crucial { background: #fef3c7; color: #d97706; }
+        .tag-fighter { background: #dcfce7; color: #16a34a; }
+
+        .footer-note {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .small-txt { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; display: block; }
+
+        .auction-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .auction-card { padding: 15px; border-radius: 12px; text-align: center; }
+        .auc-best { background: #dcfce7; border: 2px solid #22c55e; color: #16a34a; }
+        .auc-safe { background: #fef3c7; border: 2px solid #f59e0b; color: #d97706; }
+
         @media (max-width: 1024px) {
-            .calculator-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .sidebar {
-                width: 250px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            body {
-                flex-direction: column;
-            }
-            
-            .sidebar {
-                width: 100%;
-                padding: 15px;
-                border-radius: 0; /* Remove border-radius on small screens */
-            }
-            
-            .logo {
-                height: 120px; /* Adjusted for mobile responsiveness, still larger */
-                margin-bottom: 20px;
-            }
-            
-            .menu {
-                display: flex;
-                overflow-x: auto; /* Allow horizontal scrolling for menu items */
-                gap: 10px;
-                padding-bottom: 10px; /* Add padding for scrollbar */
-            }
-            
-            .menu-item {
-                min-width: 150px;
-                margin-bottom: 0;
-            }
-            
-            .main-content {
-                padding: 20px;
-            }
-            
-            .auction-recommendation {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: relative; }
+            .nav-menu { flex-direction: row; overflow-x: auto; }
+            .nav-item { min-width: 140px; }
+            .grid-layout { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="logo"></div>
-        <nav class="menu">
-            <button class="menu-item active" data-section="raid">
-                🏴‍☠️ 레이드 계산기
-            </button>
-            <button class="menu-item" data-section="auction">
-                � 경매 입찰금 계산기
-            </button>
+    <aside class="sidebar">
+        <div class="logo-container"></div>
+        <nav class="nav-menu">
+            <button class="nav-item active" data-target="raid-section">🏴‍☠️ 레이드 계산기</button>
+            <button class="nav-item" data-target="auction-section">⚖️ 경매 분배 계산</button>
         </nav>
-    </div>
+    </aside>
 
-    <div class="main-content">
-        <!-- Raid Calculator Section -->
-        <div class="calculator-section active" id="raid-section">
-            <div class="calculator-grid">
-                <!-- Damage Calculator -->
-                <div class="calculator-card">
-                    <h3>잔혈 계산기</h3>
-                    
-                    <div class="form-group">
+    <main class="main-content">
+        <section id="raid-section" class="section active">
+            <div class="grid-layout">
+                <div class="card">
+                    <h2>🗡️ 잔혈/강투 판독기</h2>
+                    <div class="field">
                         <label>레이드 선택</label>
-                        <div class="button-group" id="raid-buttons">
-                            <button class="option-btn" data-value="에기르">에기르</button>
-                            <button class="option-btn" data-value="아브렐슈드">아브렐슈드</button>
-                            <button class="option-btn" data-value="모르둠">모르둠</button>
+                        <div class="btn-group" id="boss-select">
+                            <button class="btn-opt" data-val="1막">1막</button>
+                            <button class="btn-opt" data-val="2막">2막</button>
+                            <button class="btn-opt" data-val="3막">3막</button>
+                            <button class="btn-opt" data-val="4막">4막</button>
+                            <button class="btn-opt" data-val="종막">종막</button>
+                            <button class="btn-opt" data-val="그림자" style="border-color: var(--shadow); color: var(--shadow);">그림자(4인)</button>
                         </div>
                     </div>
-
-                    <div class="form-group">
+                    <div class="field">
                         <label>난이도</label>
-                        <div class="button-group" id="difficulty-buttons">
-                            <button class="option-btn" data-value="노말" disabled>노말</button>
-                            <button class="option-btn" data-value="하드" disabled>하드</button>
+                        <div class="btn-group" id="diff-select">
+                            <button class="btn-opt" data-val="노말" disabled>노말</button>
+                            <button class="btn-opt" data-val="하드" disabled>하드</button>
+                            <button class="btn-opt" data-val="더퍼" disabled>더퍼</button>
+                            <button class="btn-opt" data-val="나메" disabled>나메</button>
                         </div>
                     </div>
-
-                    <div class="form-group">
+                    <div class="field">
                         <label>관문</label>
-                        <div class="button-group" id="gate-buttons">
-                            <button class="option-btn" data-value="1관" disabled>1관</button>
-                            <button class="option-btn" data-value="2관" disabled>2관</button>
-                            <button class="option-btn" data-value="3관" disabled>3관</button>
+                        <div class="btn-group" id="gate-select"></div>
+                    </div>
+                    <div class="field">
+                        <label>내 딜량 (억 단위)</label>
+                        <input type="number" id="my-damage" placeholder="예: 450" step="1">
+                    </div>
+                    <button class="btn-calc" id="btn-calc-raid" disabled>등급 확인하기</button>
+
+                    <div class="result-box" id="raid-result">
+                        <div class="result-item">
+                            <span>나의 등급</span>
+                            <span id="res-rank" class="rank-tag">-</span>
                         </div>
+                        <div class="result-item">
+                            <span>딜 비중 (%)</span>
+                            <span id="res-percent" style="font-weight: 700; color: var(--primary);">0%</span>
+                        </div>
+                        <div class="result-item" id="res-dps-item" style="display:none;">
+                            <span>예상 DPS</span>
+                            <span id="res-dps-val" style="font-weight: 700;">-</span>
+                        </div>
+                        <div id="res-desc" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px; line-height: 1.4;"></div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="damage-input">내 딜량 (억 단위)</label>
-                        <input type="number" id="damage-input" placeholder="예: 350.5" step="0.1" min="0">
-                    </div>
-
-                    <button class="calculate-btn" id="raid-calculate" disabled>결과 계산</button>
-
-                    <div class="result" id="raid-result">
-                        <h4>계산 결과</h4>
-                        <div id="raid-result-content"></div>
-                    </div>
-
-                    <div class="result" id="cutoff-display">
-                        <h4>컷 정보</h4>
-                        <div id="cutoff-content"></div>
-                    </div>
+                    
+                    <div class="footer-note">사용한 에스더에 따라 편차가 있을 수 있습니다.</div>
                 </div>
 
-                <!-- Burden Dealer Calculator -->
-                <div class="calculator-card">
-                    <h3>버러지 딜러 계산기</h3>
-                    
-                    <div class="form-group">
-                        <label>파티 구성</label>
-                        <div class="button-group" id="party-type-buttons">
-                            <button class="option-btn" data-value="4">4인</button>
-                            <button class="option-btn" data-value="8">8인</button>
+                <div class="card">
+                    <h2>📊 관문 등급 컷 정보</h2>
+                    <div id="gate-info-empty" style="text-align: center; color: var(--text-muted); padding: 40px 0;">
+                        관문을 선택하면 상세 기준이 표시됩니다.
+                    </div>
+                    <div id="gate-info-content" style="display:none;">
+                        <div class="result-item">
+                            <span>보스 이름</span>
+                            <span id="info-boss" style="font-weight: 700; color: var(--primary);">?</span>
                         </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="my-damage-percent">내 딜 퍼센트 (%)</label>
-                        <input type="number" id="my-damage-percent" placeholder="자동 입력됩니다" step="0.1" min="0" readonly class="auto-input">
-                    </div>
-
-                    <div class="form-group" id="dealer-selection" style="display: none;">
-                        <label>파티원들의 딜 등급</label>
-                        <div id="dealer-rows"></div>
-                    </div>
-
-                    <button class="calculate-btn" id="party-calculate" disabled>버러지 딜러 찾기</button>
-
-                    <div class="result" id="party-result">
-                        <h4>파티 분석 결과</h4>
-                        <div id="party-result-content"></div>
+                        <div class="result-item">
+                            <span>전체 체력 (추정)</span>
+                            <span id="info-hp" style="font-weight: 700;">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span>잔혈 컷 (억 단위)</span>
+                            <div>
+                                <span id="info-bloody" style="color:var(--danger); font-weight: 700;">-</span>
+                                <span class="small-txt" id="info-bloody-pct"></span>
+                                <span class="small-txt" id="info-bloody-dps" style="color:var(--danger)"></span>
+                            </div>
+                        </div>
+                        <div class="result-item">
+                            <span>강투 컷 (억 단위)</span>
+                            <div>
+                                <span id="info-crucial" style="color:var(--warning); font-weight: 700;">-</span>
+                                <span class="small-txt" id="info-crucial-pct"></span>
+                                <span class="small-txt" id="info-crucial-dps" style="color:var(--warning)"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Auction Calculator Section -->
-        <div class="calculator-section" id="auction-section">
-            <div class="single-calculator">
-                <div class="calculator-card">
-                    <h3>경매 입찰금 계산기</h3>
-                    
-                    <div class="form-group">
-                        <label for="auction-price">경매장 판매 금액 (골드)</label>
-                        <input type="number" id="auction-price" placeholder="예: 30000" min="0">
+        <section id="auction-section" class="section">
+            <div class="card" style="max-width: 600px; margin: 0 auto;">
+                <h2>⚖️ 경매 입찰금 계산기</h2>
+                <div class="field">
+                    <label>아이템 경매장 시세 (골드)</label>
+                    <input type="number" id="auc-price" placeholder="예: 50000">
+                </div>
+                <div class="field">
+                    <label>참여 인원</label>
+                    <div class="btn-group" id="auc-size-select">
+                        <button class="btn-opt" data-val="4">4인</button>
+                        <button class="btn-opt" data-val="8">8인</button>
+                        <button class="btn-opt" data-val="16">16인</button>
                     </div>
-
-                    <div class="form-group">
-                        <label>참여 인원수</label>
-                        <div class="button-group" id="participants-buttons">
-                            <button class="option-btn" data-value="4">4인</button>
-                            <button class="option-btn" data-value="8">8인</button>
-                            <button class="option-btn" data-value="16">16인</button>
+                </div>
+                <div class="result-box active" style="display: block; border: none; background: transparent; padding: 0;">
+                    <div class="auction-grid">
+                        <div class="auction-card auc-best">
+                            <div style="font-size: 0.8rem; font-weight: 600;">입찰 추천가 (선점)</div>
+                            <div id="auc-res-best" style="font-size: 1.5rem; font-weight: 800;">0</div>
                         </div>
-                    </div>
-
-                    <div class="result" id="auction-result">
-                        <h4>입찰 추천 정보</h4>
-                        <div id="auction-result-content"></div>
+                        <div class="auction-card auc-safe">
+                            <div style="font-size: 0.8rem; font-weight: 600;">손익 분기점</div>
+                            <div id="auc-res-safe" style="font-size: 1.5rem; font-weight: 800;">0</div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Custom Message Box HTML -->
-    <div class="message-box-overlay" id="message-box-overlay">
-        <div class="message-box">
-            <h4 id="message-box-title"></h4>
-            <p id="message-box-content"></p>
-            <button id="message-box-ok">확인</button>
-        </div>
-    </div>
+        </section>
+    </main>
 
     <script>
-        console.log('🚀 로스트아크 통합 계산기 로드됨!');
-        
-        // Boss data for Raid Calculator
-        const bossData = {
-            "에기르": {
-                "노말": {
-                    "1관": { hp: 1615, fighterCut: 270, crucialCut: { min: 270, max: 365 }, bloodyCut: 365 },
-                    "2관": { hp: 2132, fighterCut: 335, crucialCut: { min: 335, max: 450 }, bloodyCut: 450 }
+        // Updated Data with images and provided percentage rules
+        // Rule: 8-man (Crucial 15%, Bloody 20%) / 4-man (Crucial 30%, Bloody 40%)
+        // HP is calculated as BloodyCut / 0.20 (8-man) or BloodyCut / 0.40 (4-man)
+        const RAID_DATA = {
+            "1막": {
+                "노말": { "1": { boss: "일리아칸", crucial: 274, bloody: 365, hp: 1825, party: 8 }, "2": { boss: "에기르", crucial: 340, bloody: 450, hp: 2250, party: 8 } },
+                "하드": { "1": { boss: "일리아칸", crucial: 450, bloody: 600, hp: 3000, party: 8 }, "2": { boss: "에기르", crucial: 600, bloody: 800, hp: 4000, party: 8 } }
+            },
+            "2막": {
+                "노말": { "1": { boss: "나로크", crucial: 450, bloody: 600, hp: 3000, party: 8 }, "2": { boss: "아브렐슈드", crucial: 610, bloody: 810, hp: 4050, party: 8 } },
+                "하드": { "1": { boss: "나로크", crucial: 900, bloody: 1200, hp: 6000, party: 8 }, "2": { boss: "아브렐슈드", crucial: 1200, bloody: 1600, hp: 8000, party: 8 } }
+            },
+            "3막": {
+                "노말": { "1": { boss: "카멘", crucial: 510, bloody: 680, hp: 3400, party: 8 }, "2": { boss: "나이트레아", crucial: 480, bloody: 640, hp: 3200, party: 8 }, "3": { boss: "모르둠", crucial: 1050, bloody: 1400, hp: 7000, party: 8 } },
+                "하드": { "1": { boss: "카멘", crucial: 820, bloody: 1100, hp: 5500, party: 8 }, "2": { boss: "나이트레아", crucial: 880, bloody: 1170, hp: 5850, party: 8 }, "3": { boss: "모르둠", crucial: 1920, bloody: 2560, hp: 12800, party: 8 } }
+            },
+            "4막": {
+                "노말": { "1": { boss: "에키드나", crucial: 740, bloody: 990, hp: 4950, party: 8 }, "2": { boss: "아르모체", crucial: 950, bloody: 1270, hp: 6350, party: 8 } },
+                "하드": { "1": { boss: "에키드나", crucial: 1425, bloody: 1900, hp: 9500, party: 8 }, "2": { boss: "아르모체", crucial: 1575, bloody: 2100, hp: 10500, party: 8 } }
+            },
+            "종막": {
+                "노말": { "1": { boss: "카제로스", crucial: 1190, bloody: 1590, hp: 7950, party: 8 }, "2": { boss: "카제로스", crucial: 1050, bloody: 1400, hp: 7000, party: 8 } },
+                "하드": { 
+                    "1": { boss: "카제로스", crucial: 2370, bloody: 3170, hp: 15850, party: 8 }, 
+                    "2": { boss: "카제로스(G2)", crucial: 4200, bloody: 5625, hp: 28125, party: 8 },
+                    "2-1": { boss: "카제로스(G2-1)", crucial: 2175, bloody: 2900, hp: 14500, party: 8 },
+                    "2-2": { boss: "카제로스(G2-2)", crucial: 1150, bloody: 1530, hp: 7650, party: 8 },
+                    "2-3": { boss: "카제로스(G2-3)", crucial: 875, bloody: 1200, hp: 6000, party: 8 }
                 },
-                "하드": {
-                    "1관": { hp: 2698, fighterCut: 450, crucialCut: { min: 450, max: 600 }, bloodyCut: 600 },
-                    "2관": { hp: 3985, fighterCut: 600, crucialCut: { min: 600, max: 800 }, bloodyCut: 800 }
+                "더퍼": {
+                    "1": { boss: "카제로스", crucial: 3660, bloody: 4900, hp: 24500, party: 8 },
+                    "2": { boss: "카제로스(G2)", crucial: 6160, bloody: 8200, hp: 41000, party: 8 },
+                    "2-1": { boss: "카제로스(G2-1)", crucial: 3180, bloody: 4250, hp: 21250, party: 8 },
+                    "2-2": { boss: "카제로스(G2-2)", crucial: 1660, bloody: 2200, hp: 11000, party: 8 },
+                    "2-3": { boss: "카제로스(G2-3)", crucial: 1320, bloody: 1750, hp: 8750, party: 8 }
                 }
             },
-            "아브렐슈드": {
-                "노말": {
-                    "1관": { hp: 2754, fighterCut: 450, crucialCut: { min: 450, max: 600 }, bloodyCut: 600 },
-                    "2관": { hp: 3994, fighterCut: 610, crucialCut: { min: 610, max: 810 }, bloodyCut: 810 }
+            "그림자": {
+                "노말": { 
+                    "1": { boss: "세르카", crucial: 1100, bloody: 1480, hp: 3700, d_crucial: 1.83, d_bloody: 2.46, party: 4 },
+                    "2": { boss: "룰라크", crucial: 1430, bloody: 1900, hp: 4750, d_crucial: 2.38, d_bloody: 3.16, party: 4 }
                 },
-                "하드": {
-                    "1관": { hp: 5163, fighterCut: 900, crucialCut: { min: 900, max: 1200 }, bloodyCut: 1200 },
-                    "2관": { hp: 8253, fighterCut: 1200, crucialCut: { min: 1200, max: 1600 }, bloodyCut: 1600 }
-                }
-            },
-            "모르둠": {
-                "노말": {
-                    "1관": { hp: 3687, fighterCut: 525, crucialCut: { min: 525, max: 700 }, bloodyCut: 700 },
-                    "2관": { hp: 3346, fighterCut: 460, crucialCut: { min: 460, max: 620 }, bloodyCut: 620 },
-                    "3관": { hp: 7319, fighterCut: 1000, crucialCut: { min: 1000, max: 1360 }, bloodyCut: 1360 }
+                "하드": { 
+                    "1": { boss: "세르카", crucial: 2300, bloody: 3070, hp: 7675, d_crucial: 3.83, d_bloody: 5.11, party: 4 },
+                    "2": { boss: "룰라크", crucial: 2980, bloody: 3970, hp: 9925, d_crucial: 4.96, d_bloody: 6.61, party: 4 }
                 },
-                "하드": {
-                    "1관": { hp: 6525, fighterCut: 940, crucialCut: { min: 940, max: 1250 }, bloodyCut: 1250 },
-                    "2관": { hp: 6630, fighterCut: 970, crucialCut: { min: 970, max: 1300 }, bloodyCut: 1300 },
-                    "3관": { hp: 14737, fighterCut: 2150, crucialCut: { min: 2150, max: 2950 }, bloodyCut: 2950 }
+                "나메": { 
+                    "1": { boss: "세르카", crucial: 3580, bloody: 4770, hp: 11925, d_crucial: 5.96, d_bloody: 7.95, party: 4 },
+                    "2": { boss: "룰라크", crucial: 4620, bloody: 6160, hp: 15400, d_crucial: 7.7, d_bloody: 10.26, party: 4 }
                 }
             }
         };
 
-        // Global state variables for calculators
-        let selectedRaid = '';
-        let selectedDifficulty = '';
-        let selectedGate = '';
-        let selectedParticipants = 0; // For Auction Calculator
-        let selectedPartyType = 0; // For Burden Dealer Calculator (4 or 8 players)
-        let myDamagePercent = 0; // For Burden Dealer Calculator
-        let dealerRanks = []; // Array to store ranks of other dealers
+        let state = { raid: '', diff: '', gate: '' };
+        const fmt = (n) => Math.floor(n).toLocaleString();
 
-        // --- Utility Functions ---
-
-        /**
-         * Displays a custom message box instead of alert().
-         * @param {string} title - The title of the message box.
-         * @param {string} message - The content message.
-         */
-        function showMessageBox(title, message) {
-            const overlay = document.getElementById('message-box-overlay');
-            document.getElementById('message-box-title').textContent = title;
-            document.getElementById('message-box-content').textContent = message;
-            overlay.classList.add('show');
-        }
-
-        /**
-         * Hides the custom message box.
-         */
-        function hideMessageBox() {
-            document.getElementById('message-box-overlay').classList.remove('show');
-        }
-
-        /**
-         * Handles clicks on option buttons within a specific group.
-         * @param {HTMLElement} container - The container element for the buttons.
-         * @param {string} dataAttribute - The data attribute to read (e.g., 'value').
-         * @param {function} callback - Callback function to execute with the selected value.
-         */
-        function setupOptionButtons(containerId, dataAttribute, callback) {
-            const container = document.getElementById(containerId);
-            if (!container) return; // Exit if container doesn't exist
-
-            container.addEventListener('click', function(e) {
-                if (e.target.classList.contains('option-btn') && !e.target.disabled) {
-                    // Remove 'active' from all buttons in this group
-                    container.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
-                    // Add 'active' to the clicked button
-                    e.target.classList.add('active');
-                    // Execute callback with the selected value
-                    callback(e.target.dataset[dataAttribute]);
-                }
+        function setupBtnGroup(groupId, stateKey, callback) {
+            const btns = document.querySelectorAll(`#${groupId} .btn-opt`);
+            btns.forEach(btn => {
+                btn.onclick = () => {
+                    btns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    state[stateKey] = btn.dataset.val;
+                    if (callback) callback(btn.dataset.val);
+                };
             });
         }
 
-        /**
-         * Updates the disabled state of a calculate button based on conditions.
-         * @param {string} buttonId - The ID of the calculate button.
-         * @param {boolean} condition - The condition that enables the button.
-         */
-        function updateCalculateButtonState(buttonId, condition) {
-            const button = document.getElementById(buttonId);
-            if (button) {
-                button.disabled = !condition;
-            }
-        }
-
-        /**
-         * Resets the active state of buttons within a group and disables them if specified.
-         * @param {string} containerId - The ID of the button group container.
-         * @param {boolean} disable - Whether to disable the buttons after resetting.
-         */
-        function resetOptionButtons(containerId, disable = false) {
-            const container = document.getElementById(containerId);
-            if (container) {
-                container.querySelectorAll('.option-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                    btn.disabled = disable;
-                });
-            }
-        }
-
-        // --- Menu Navigation ---
-        document.querySelectorAll('.menu-item').forEach(item => {
-            item.addEventListener('click', function() {
-                // Remove active class from all menu items and sections
-                document.querySelectorAll('.menu-item').forEach(mi => mi.classList.remove('active'));
-                document.querySelectorAll('.calculator-section').forEach(cs => cs.classList.remove('active'));
-                
-                // Add active class to clicked item and corresponding section
-                this.classList.add('active');
-                const sectionId = this.dataset.section + '-section';
-                document.getElementById(sectionId).classList.add('active');
+        setupBtnGroup('boss-select', 'raid', (val) => {
+            document.querySelectorAll('#diff-select .btn-opt').forEach(b => {
+                b.disabled = !RAID_DATA[val][b.dataset.val];
+                b.classList.remove('active');
             });
+            state.diff = ''; state.gate = '';
+            updateGateBtns(); checkReady();
         });
 
-        // --- Raid Calculator Logic ---
+        setupBtnGroup('diff-select', 'diff', updateGateBtns);
 
-        /**
-         * Updates the state and UI for raid selection.
-         * @param {string} raid - The selected raid name.
-         */
-        function handleRaidSelection(raid) {
-            selectedRaid = raid;
-            resetOptionButtons('difficulty-buttons', false); // Enable difficulty buttons
-            resetOptionButtons('gate-buttons', true); // Disable gate buttons initially
-            selectedDifficulty = ''; // Reset difficulty
-            selectedGate = ''; // Reset gate
-            document.getElementById('cutoff-display').classList.remove('show'); // Hide cutoff info
-            updateRaidCalculateButton();
-        }
-
-        /**
-         * Updates the state and UI for difficulty selection.
-         * @param {string} difficulty - The selected difficulty.
-         */
-        function handleDifficultySelection(difficulty) {
-            selectedDifficulty = difficulty;
-            resetOptionButtons('gate-buttons', true); // Disable all gate buttons first
-            selectedGate = ''; // Reset gate
-            document.getElementById('cutoff-display').classList.remove('show'); // Hide cutoff info
-
-            // Enable only relevant gate buttons based on selected raid and difficulty
-            if (selectedRaid && selectedDifficulty && bossData[selectedRaid][selectedDifficulty]) {
-                Object.keys(bossData[selectedRaid][selectedDifficulty]).forEach(gate => {
-                    const gateBtn = document.querySelector(`#gate-buttons .option-btn[data-value="${gate}"]`);
-                    if (gateBtn) gateBtn.disabled = false;
+        function updateGateBtns() {
+            const container = document.getElementById('gate-select');
+            container.innerHTML = '';
+            if (state.raid && state.diff) {
+                Object.keys(RAID_DATA[state.raid][state.diff]).forEach(g => {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-opt';
+                    btn.textContent = g.includes('-') ? g : g + '관';
+                    btn.onclick = () => {
+                        container.querySelectorAll('.btn-opt').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        state.gate = g;
+                        showInfo(); checkReady();
+                    };
+                    container.appendChild(btn);
                 });
             }
-            updateRaidCalculateButton();
+            checkReady();
         }
 
-        /**
-         * Updates the state and UI for gate selection and displays cutoff info.
-         * @param {string} gate - The selected gate.
-         */
-        function handleGateSelection(gate) {
-            selectedGate = gate;
-            const bossInfo = bossData[selectedRaid][selectedDifficulty][selectedGate];
-            if (bossInfo) {
-                document.getElementById('cutoff-content').innerHTML = `
-                    <div class="result-item cutoff-info">
-                        <strong>${selectedRaid} ${selectedDifficulty} ${selectedGate}</strong>
-                    </div>
-                    <div class="result-item cutoff-info">
-                        투사: ${bossInfo.fighterCut}억 미만
-                    </div>
-                    <div class="result-item cutoff-info">
-                        강투: ${bossInfo.crucialCut.min}~${bossInfo.crucialCut.max}억
-                    </div>
-                    <div class="result-item cutoff-info">
-                        잔혈: ${bossInfo.bloodyCut}억 이상
-                    </div>
-                `;
-                document.getElementById('cutoff-display').classList.add('show');
-            }
-            updateRaidCalculateButton();
+        function showInfo() {
+            const data = RAID_DATA[state.raid][state.diff][state.gate];
+            document.getElementById('gate-info-empty').style.display = 'none';
+            document.getElementById('gate-info-content').style.display = 'block';
+            document.getElementById('info-boss').textContent = data.boss;
+            document.getElementById('info-hp').textContent = fmt(data.hp) + '억';
+            document.getElementById('info-bloody').textContent = fmt(data.bloody);
+            document.getElementById('info-crucial').textContent = fmt(data.crucial);
+            document.getElementById('info-bloody-pct').textContent = `(비중: ${data.party === 4 ? '40%' : '20%'})`;
+            document.getElementById('info-crucial-pct').textContent = `(비중: ${data.party === 4 ? '30%' : '15%'})`;
+            document.getElementById('info-bloody-dps').textContent = data.d_bloody ? `DPS: ${data.d_bloody}` : '';
+            document.getElementById('info-crucial-dps').textContent = data.d_crucial ? `DPS: ${data.d_crucial}` : '';
         }
 
-        /**
-         * Updates the enabled/disabled state of the raid calculate button.
-         */
-        function updateRaidCalculateButton() {
-            const damageInput = document.getElementById('damage-input');
-            const isValid = selectedRaid && selectedDifficulty && selectedGate && damageInput.value !== '';
-            updateCalculateButtonState('raid-calculate', isValid);
+        function checkReady() {
+            document.getElementById('btn-calc-raid').disabled = !(state.raid && state.diff && state.gate && document.getElementById('my-damage').value > 0);
         }
 
-        /**
-         * Performs the raid damage calculation and displays results.
-         */
-        function calculateRaidDamage() {
-            const damageInput = document.getElementById('damage-input');
-            const damage = parseFloat(damageInput.value);
+        document.getElementById('my-damage').oninput = checkReady;
 
-            if (!selectedRaid || !selectedDifficulty || !selectedGate || isNaN(damage) || damage < 0) {
-                showMessageBox('입력 오류', '모든 필드를 올바르게 입력해주세요 (딜량은 0 이상).');
-                return;
-            }
-
-            const bossInfo = bossData[selectedRaid][selectedDifficulty][selectedGate];
-            const damagePercentage = (damage / bossInfo.hp) * 100;
-
-            let rank, rankClass;
-            if (damage < bossInfo.fighterCut) {
-                rank = '투사';
-                rankClass = 'rank-fighter';
-            } else if (damage < bossInfo.bloodyCut) {
-                rank = '강투';
-                rankClass = 'rank-crucial';
-            } else {
-                rank = '잔혈';
-                rankClass = 'rank-bloody';
-            }
-
-            document.getElementById('raid-result-content').innerHTML = `
-                <div class="result-item ${rankClass}">
-                    <strong>딜량:</strong> ${damage.toLocaleString()}억
-                </div>
-                <div class="result-item ${rankClass}">
-                    <strong>등급:</strong> ${rank} (${damagePercentage.toFixed(1)}%)
-                </div>
-            `;
-            document.getElementById('raid-result').classList.add('show');
-
-            // Automatically update my-damage-percent for Burden Dealer Calculator
-            myDamagePercent = damagePercentage;
-            const myPercentInput = document.getElementById('my-damage-percent');
-            if (myPercentInput) {
-                myPercentInput.value = damagePercentage.toFixed(1);
-            }
-            updatePartyCalculateButton();
-        }
-
-        // Event listeners for Raid Calculator
-        setupOptionButtons('raid-buttons', 'value', handleRaidSelection);
-        setupOptionButtons('difficulty-buttons', 'value', handleDifficultySelection);
-        setupOptionButtons('gate-buttons', 'value', handleGateSelection);
-        document.getElementById('damage-input')?.addEventListener('input', updateRaidCalculateButton);
-        document.getElementById('raid-calculate')?.addEventListener('click', calculateRaidDamage);
-
-
-        // --- Burden Dealer Calculator Logic ---
-
-        /**
-         * Handles party type selection (4 or 8 players).
-         * @param {string} type - '4' or '8'.
-         */
-        function handlePartyTypeSelection(type) {
-            selectedPartyType = parseInt(type);
-            const dealerCount = selectedPartyType === 4 ? 2 : 5; // 4-man party has 3 dealers (1 me + 2 others), 8-man has 6 dealers (1 me + 5 others)
-            dealerRanks = new Array(dealerCount).fill(''); // Reset dealer ranks
-
-            let dealerHTML = '';
-            for (let i = 0; i < dealerCount; i++) {
-                dealerHTML += `
-                    <div class="dealer-row">
-                        <div class="dealer-label">딜러${i + 1}</div>
-                        <div class="dealer-buttons" data-dealer-row="${i}">
-                            <button class="dealer-btn fighter" data-dealer="${i}" data-rank="투사">투사</button>
-                            <button class="dealer-btn crucial" data-dealer="${i}" data-rank="강투">강투</button>
-                            <button class="dealer-btn bloody" data-dealer="${i}" data-rank="잔혈">잔혈</button>
-                            <button class="dealer-btn unknown" data-dealer="${i}" data-rank="모름">모름</button>
-                        </div>
-                    </div>
-                `;
-            }
+        document.getElementById('btn-calc-raid').onclick = () => {
+            const dmg = parseFloat(document.getElementById('my-damage').value);
+            const data = RAID_DATA[state.raid][state.diff][state.gate];
+            const pct = (dmg / data.hp) * 100;
+            const resBox = document.getElementById('raid-result');
+            const resRank = document.getElementById('res-rank');
             
-            document.getElementById('dealer-rows').innerHTML = dealerHTML;
-            document.getElementById('dealer-selection').style.display = 'block';
-            document.getElementById('party-result').classList.remove('show'); // Hide previous result
-
-            // Add event listener for the newly created dealer buttons using delegation
-            document.getElementById('dealer-rows').addEventListener('click', handleDealerRankSelection);
-            updatePartyCalculateButton();
-        }
-
-        /**
-         * Handles selection of individual dealer ranks.
-         * @param {Event} e - The click event.
-         */
-        function handleDealerRankSelection(e) {
-            if (e.target.classList.contains('dealer-btn')) {
-                const dealerIndex = parseInt(e.target.dataset.dealer);
-                const rank = e.target.dataset.rank;
-                
-                // Remove 'active' from all buttons in this dealer's row
-                document.querySelectorAll(`[data-dealer="${dealerIndex}"]`).forEach(btn => btn.classList.remove('active'));
-                // Add 'active' to the clicked button
-                e.target.classList.add('active');
-                dealerRanks[dealerIndex] = rank;
-                
-                updatePartyCalculateButton();
-            }
-        }
-
-        /**
-         * Updates the enabled/disabled state of the party calculate button.
-         */
-        function updatePartyCalculateButton() {
-            const allDealerRanksSelected = dealerRanks.every(rank => rank !== '');
-            const hasMyPercent = myDamagePercent > 0;
-            updateCalculateButtonState('party-calculate', allDealerRanksSelected && hasMyPercent);
-        }
-
-        /**
-         * Calculates and displays burden dealer information.
-         */
-        function findBurdenDealers() {
-            console.log('🎯 버러지 딜러 찾기 시작!');
+            resBox.classList.add('active');
+            document.getElementById('res-percent').textContent = pct.toFixed(2) + '%';
             
-            if (selectedPartyType === 0 || myDamagePercent === 0 || dealerRanks.some(rank => rank === '')) {
-                showMessageBox('입력 오류', '파티 구성, 내 딜 퍼센트, 그리고 모든 파티원의 딜 등급을 입력해주세요.');
-                return;
-            }
+            let rank = '투사', rClass = 'tag-fighter';
+            const cCut = data.party === 4 ? 30 : 15;
+            const bCut = data.party === 4 ? 40 : 20;
 
-            // Total number of actual dealers in the party (excluding supports)
-            // 4-man party: 3 dealers (1 support)
-            // 8-man party: 6 dealers (2 supports)
-            const totalDealersCount = selectedPartyType === 4 ? 3 : 6;
-            const supportCount = selectedPartyType === 4 ? 1 : 2;
-            const totalDealerTarget = 100 - (supportCount * 2); // Assuming supports contribute 2% each to total party damage
-
-            const fighterCount = dealerRanks.filter(r => r === '투사').length;
-            const crucialCount = dealerRanks.filter(r => r === '강투').length;
-            const bloodyCount = dealerRanks.filter(r => r === '잔혈').length;
-            const unknownCount = dealerRanks.filter(r => r === '모름').length;
-
-            const myDamage = myDamagePercent;
-            // Approximate damage contribution based on rank
-            // 투사 (Fighter): ~10%
-            // 강투 (Crucial): ~15%
-            // 잔혈 (Bloody): ~20%
-            const fighterDamageEstimate = fighterCount * 10;
-            const crucialDamageEstimate = crucialCount * 15;
-            const bloodyDamageEstimate = bloodyCount * 20;
+            if (pct >= bCut) { rank = '잔혹한 혈투사'; rClass = 'tag-bloody'; }
+            else if (pct >= cCut) { rank = '강인한 투사'; rClass = 'tag-crucial'; }
             
-            const confirmedDamage = myDamage + fighterDamageEstimate + crucialDamageEstimate + bloodyDamageEstimate;
-            const remainingDamage = totalDealerTarget - confirmedDamage;
-            const unknownAverageDamage = unknownCount > 0 ? remainingDamage / unknownCount : 0;
+            resRank.textContent = rank;
+            resRank.className = 'rank-tag ' + rClass;
 
-            console.log('계산 결과:', {
-                totalDealerTarget,
-                confirmedDamage,
-                remainingDamage,
-                unknownCount,
-                unknownAverageDamage,
-                isFighter: unknownAverageDamage < 15 // If average of unknown is less than 15%, they are likely fighters
-            });
+            const dpsItem = document.getElementById('res-dps-item');
+            if (data.d_bloody) {
+                dpsItem.style.display = 'flex';
+                const dpsVal = (dmg / data.bloody) * data.d_bloody;
+                document.getElementById('res-dps-val').textContent = dpsVal.toFixed(2);
+            } else { dpsItem.style.display = 'none'; }
 
-            let html = '';
+            document.getElementById('res-desc').innerHTML = `추정 체력 ${fmt(data.hp)}억 중 ${dmg}억 (${pct.toFixed(2)}%)을 딜링했습니다.`;
+        };
 
-            html += `
-                <div class="result-item" style="background: #fff3cd; border-left-color: #ffc107; color: #856404;">
-                    <strong>📊 상세 계산:</strong><br>
-                    • 딜러 목표: ${totalDealerTarget}% (${selectedPartyType}인 파티 중 딜러 ${totalDealersCount}명)<br>
-                    • 내 딜: ${myDamage.toFixed(1)}%<br>
-                    • 확인된 딜러들의 예상 합산 딜: ${confirmedDamage.toFixed(1)}%<br>
-                    • 미확인 딜러들에게 요구되는 딜: ${remainingDamage.toFixed(1)}%<br>
-                    • 모름 ${unknownCount}명 평균 딜: ${unknownAverageDamage.toFixed(1)}%<br>
-                    • <strong>${unknownAverageDamage.toFixed(1)}% ${unknownAverageDamage < 15 ? '< 15% → 🚨 투사 추정!' : '≥ 15% → 강투 이상 추정'}</strong>
-                </div>
-            `;
-
-            const hasFighters = fighterCount > 0;
-            const hasHiddenFighters = unknownCount > 0 && unknownAverageDamage < 15;
-
-            if (hasFighters || hasHiddenFighters) {
-                html += `
-                    <div class="congratulations">
-                        🎉 축하합니다! 버러지 딜러의 통나무를 들어주셨군요! 🎉
-                    </div>
-                `;
-
-                if (hasFighters) {
-                    html += `<div class="result-item rank-fighter"><strong>확정 투사:</strong> ${fighterCount}명</div>`;
-                }
-
-                if (hasHiddenFighters) {
-                    html += `
-                        <div class="result-item rank-bloody">
-                            <strong>🚨 숨겨진 투사 추정:</strong> ${unknownCount}명<br>
-                            <small>평균 ${unknownAverageDamage.toFixed(1)}% (15% 미만)</small>
-                        </div>
-                    `;
-                }
-
-                html += `<div class="result-item"><strong>총 투사 (추정) 수:</strong> ${fighterCount + (hasHiddenFighters ? unknownCount : 0)}명</div>`;
-            } else {
-                html += `
-                    <div class="result-item rank-fighter">
-                        <strong>✅ 다행히 투사 딜러는 없습니다!</strong><br>
-                        <small>모름 딜러 평균: ${unknownAverageDamage.toFixed(1)}% (강투 이상)</small>
-                    </div>
-                `;
-            }
-
-            document.getElementById('party-result-content').innerHTML = html;
-            document.getElementById('party-result').classList.add('show');
+        // Auction Logic
+        document.getElementById('auc-price').oninput = calcAuction;
+        setupBtnGroup('auc-size-select', 'aucSize', calcAuction);
+        function calcAuction() {
+            const price = parseFloat(document.getElementById('auc-price').value);
+            const size = parseInt(state.aucSize || 4);
+            if (!price) return;
+            const net = price * 0.95;
+            const safe = net * ((size - 1) / size);
+            document.getElementById('auc-res-best').textContent = fmt(safe * 0.92);
+            document.getElementById('auc-res-safe').textContent = fmt(safe);
+            document.getElementById('auc-net').textContent = fmt(net) + ' G';
+            document.getElementById('auc-dist').textContent = fmt((safe * 0.92) / (size - 1)) + ' G';
         }
 
-        // Event listeners for Burden Dealer Calculator
-        setupOptionButtons('party-type-buttons', 'value', handlePartyTypeSelection);
-        document.getElementById('party-calculate')?.addEventListener('click', findBurdenDealers);
-
-
-        // --- Auction Calculator Logic ---
-
-        /**
-         * Calculates and displays auction bid recommendations.
-         */
-        function calculateAuction() {
-            const salePriceInput = document.getElementById('auction-price');
-            const salePrice = parseFloat(salePriceInput?.value || 0);
-
-            if (isNaN(salePrice) || selectedParticipants === 0 || salePrice <= 0) {
-                document.getElementById('auction-result').classList.remove('show');
-                return;
-            }
-
-            const actualSalePrice = Math.round(salePrice * 0.95); // 5% auction fee
-            const breakEvenBid = Math.round(actualSalePrice * 0.75); // 75% of net sale price for 1/4 split
-            const recommendedBid = Math.round(breakEvenBid * 0.91); // ~91% of breakeven for profit (e.g., 67% of original)
-
-            document.getElementById('auction-result-content').innerHTML = `
-                <div class="result-item">
-                    <strong>📊 기본 정보</strong>
-                </div>
-                <div class="result-item">
-                    <strong>판매 금액:</strong> ${salePrice.toLocaleString()} 골드
-                </div>
-                <div class="result-item">
-                    <strong>수령 금액:</strong> ${actualSalePrice.toLocaleString()} 골드 (5% 수수료 제외)
-                </div>
-                <div class="result-item">
-                    <strong>참여 인원:</strong> ${selectedParticipants}인
-                </div>
-                
-                <div class="auction-recommendation">
-                    <div class="recommendation-card profit-card">
-                        <span class="card-icon">🎯</span>
-                        <div class="card-title">입찰 추천가</div>
-                        <div class="card-amount">${recommendedBid.toLocaleString()}</div>
-                        <div class="card-desc">이득을 볼 수 있는 금액</div>
-                    </div>
-                    
-                    <div class="recommendation-card breakeven-card">
-                        <span class="card-icon">⚖️</span>
-                        <div class="card-title">손익 분기점</div>
-                        <div class="card-amount">${breakEvenBid.toLocaleString()}</div>
-                        <div class="card-desc">손해를 보지 않는 한계선</div>
-                    </div>
-                </div>
-                
-                <div class="result-item" style="background: #f0f9ff; border-left-color: #0ea5e9; color: #0c4a6e;">
-                    <strong>💡 입찰 가이드</strong><br>
-                    • <strong style="color: #15803d;">${recommendedBid.toLocaleString()}골드 이하</strong>: 이득 보장<br>
-                    • <strong style="color: #d97706;">${recommendedBid.toLocaleString()} ~ ${breakEvenBid.toLocaleString()}골드</strong>: 소폭 이득<br>
-                    • <strong style="color: #dc2626;">${breakEvenBid.toLocaleString()}골드 초과</strong>: 손해 발생
-                </div>
-            `;
-
-            document.getElementById('auction-result').classList.add('show');
-        }
-
-        // Event listeners for Auction Calculator
-        setupOptionButtons('participants-buttons', 'value', (value) => {
-            selectedParticipants = parseInt(value);
-            calculateAuction();
+        // Nav
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.onclick = () => {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                item.classList.add('active');
+                document.getElementById(item.dataset.target).classList.add('active');
+            };
         });
-        document.getElementById('auction-price')?.addEventListener('input', calculateAuction);
-
-        // Initialize message box close button
-        document.getElementById('message-box-ok')?.addEventListener('click', hideMessageBox);
-
-        console.log('✅ 모든 기능 로드 완료!');
     </script>
 </body>
 </html>
-�
